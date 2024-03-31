@@ -2,7 +2,7 @@ const { response, request } = require("express");
 
 // Endpoint GET
 const usersGet = (req = request, res = response) => {
-  const { q, name = 'GRUPO 17 ----- TEST', apiKey } = req.query;
+  const { q, name = 'GET ENDPOINT GRUPO 17 ----- TEST', apiKey } = req.query;
   res.json({
     q,
     name,
@@ -14,7 +14,7 @@ const usersGet = (req = request, res = response) => {
 const usersPut = (req, res = response) => {
   const id = req.params.id;
   res.status(400).json({
-    msg: "put - API - controller",
+    msg: "put - API - controller GRUPO 17",
     id,
   });
 };
@@ -23,7 +23,7 @@ const usersPut = (req, res = response) => {
 const usersPost = (req, res) => {
   res.status(201).json({
     ok: true,
-    msg: "post - API - controller",
+    msg: "post - API - controller GRUPO 17",
   });
 };
 
@@ -31,7 +31,7 @@ const usersPost = (req, res) => {
 const usersDelete = (req, res) => {
   res.json({
     ok: true,
-    msg: "delete - API - controller",
+    msg: "delete - API - controller GRUPO 17",
   });
 };
 
