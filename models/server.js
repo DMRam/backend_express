@@ -1,15 +1,24 @@
 const express = require("express");
 const cors = require("cors");
+const { dbConnection } = require("../database/config");
 
 class Server {
   constructor() {
     this.app = express();
-    this.port = process.env.PORT;
+    this.port = process.env.MONGO_DB_ATLAS;
     this.usersPath = "/api/users";
+
+    // Connect DB
+    this.dbConnect();
+
     //Middleware
     this.middleware();
     // Routes
     this.routes();
+  }
+
+  async dbConnect() {
+    await dbConnection();
   }
 
   //Middleware

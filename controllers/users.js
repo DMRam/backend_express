@@ -2,7 +2,7 @@ const { response, request } = require("express");
 
 // Endpoint GET
 const usersGet = (req = request, res = response) => {
-  const { q, name = 'No Name', apiKey } = req.query;
+  const { q, name = 'GRUPO 17 ----- TEST', apiKey } = req.query;
   res.json({
     q,
     name,

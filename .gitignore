@@ -43,3 +43,7 @@ yarn.lock
 
 # Ignore editor backup files
 *~
+
+
+#Mongo Credentials
+.env
