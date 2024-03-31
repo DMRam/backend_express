@@ -46,4 +46,4 @@ yarn.lock
 
 
 #Mongo Credentials
-.env
+# .env
