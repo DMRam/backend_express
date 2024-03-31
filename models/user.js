@@ -5,7 +5,7 @@ const UserSchema = Schema({
     type: String,
     require: [true, "El nombre es obligatorio"],
   },
-  mail: {
+  email: {
     type: String,
     require: [true, "El correo es obligatorio"],
     unique: true,
@@ -32,4 +32,4 @@ const UserSchema = Schema({
   },
 });
 
-module.exports = ("User", UserSchema);
+module.exports = model("User", UserSchema);
