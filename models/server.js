@@ -5,7 +5,7 @@ const { dbConnection } = require("../database/config");
 class Server {
   constructor() {
     this.app = express();
-    this.port = process.env.MONGO_DB_ATLAS;
+    this.port = process.env.PORT;
     this.usersPath = "/api/users";
 
     // Connect DB
