@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
+const RoleSchema = require("../models/role");
 const {
   usersGet,
   usersPut,
@@ -7,6 +8,7 @@ const {
   usersDelete,
 } = require("../controllers/users");
 const { fieldValidate } = require("../middleware/field-validation");
+const { isValidRole, existEmail } = require("../helpers/db-validators");
 
 const router = Router();
 
@@ -20,8 +22,9 @@ router.post(
       "password",
       "El password es obligatorio mayor a 6 caracteres"
     ).isLength({ min: 6 }),
-    check("email", "El correo ingresado no es válido").isEmail(),
-    // check("role", "No es un Rol válido").isIn(["ADMIN", "USER_ROLE"]),
+    check("email").custom(existEmail),
+    // Role is intrinsic passed thought isValidRole - One argument function
+    check("role").custom(isValidRole),
     fieldValidate,
   ],
   usersPost
