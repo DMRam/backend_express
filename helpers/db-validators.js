@@ -17,11 +17,11 @@ const existEmail = async (email = "") => {
   }
 };
 
-const existUserById = async (id = "") => {
+const existUserById = async (id ) => {
   // Check if email exist
-  const userExists = await UserModel.findById({ id });
+  const userExists = await UserModel.findById(id);
   if (!userExists) {
-    throw new Error(`El id ${id} ya está registrado`);
+    throw new Error(`El id no existe ${ id }`);
   }
 };
 

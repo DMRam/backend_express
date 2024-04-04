@@ -2,12 +2,28 @@ const { response, request } = require("express");
 const UserModel = require("../models/user");
 const bcryptjs = require("bcryptjs");
 // Endpoint GET
-const usersGet = (req = request, res = response) => {
-  const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
+const usersGet = async (req = request, res = response) => {
+  // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
+
+  // Query to filter for state = true
+  const query = { state: true };
+
+  const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/users?from=10&limit=2 => return object 11 - 12
+
+  // Getting filtered Users
+  // const users = await UserModel.find(query).skip(from).limit(Number(limit));
+
+  // const totalUsersRegistered = await UserModel.countDocuments(query);
+
+  // Arrays Destructuring -> Assign first position to Total and Second arrays position to users
+  const [total, users] = await Promise.all([
+    UserModel.countDocuments(query),
+
+    UserModel.find(query).skip(from).limit(Number(limit)),
+  ]);
   res.json({
-    q,
-    name,
-    apiKey,
+    total,
+    users,
   });
 };
 
@@ -24,10 +40,7 @@ const usersPut = async (req, res = response) => {
       { new: true }
     );
 
-    res.json({
-      msg: "User updated successfully",
-      user,
-    });
+    res.json(user);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -59,11 +72,18 @@ const usersPost = async (req, res) => {
 };
 
 // Endpoint DELETE
-const usersDelete = (req, res) => {
-  res.json({
-    ok: true,
-    msg: "delete - API - controller GRUPO 17",
+const usersDelete = async (req, res) => {
+  const { id } = req.params;
+
+  // This is to remove an user
+  // const userToBeDeleted = await UserModel.findByIdAndDelete(id);
+
+  // This is to change user state to false
+  const userToBeDeletedByStateToFalse = await UserModel.findByIdAndUpdate(id, {
+    state: false,
   });
+
+  res.json(userToBeDeleted);
 };
 
 module.exports = {
