@@ -8,7 +8,11 @@ const {
   usersDelete,
 } = require("../controllers/users");
 const { fieldValidate } = require("../middleware/field-validation");
-const { isValidRole, existEmail } = require("../helpers/db-validators");
+const {
+  isValidRole,
+  existEmail,
+  existUserById,
+} = require("../helpers/db-validators");
 
 const router = Router();
 

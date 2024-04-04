@@ -3,7 +3,7 @@ const UserModel = require("../models/user");
 const bcryptjs = require("bcryptjs");
 // Endpoint GET
 const usersGet = (req = request, res = response) => {
-  const { q, name = "GET ENDPOINT GRUPO 17 ----- TEST", apiKey } = req.query;
+  const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
   res.json({
     q,
     name,
@@ -12,18 +12,33 @@ const usersGet = (req = request, res = response) => {
 };
 
 // Endpoint PUT
-const usersPut = (req, res = response) => {
-  const id = req.params.id;
-  res.status(400).json({
-    msg: "put - API - controller GRUPO 17",
-    id,
-  });
+const usersPut = async (req, res = response) => {
+  const { id } = req.params;
+  const { name, email, password, role, google } = req.body;
+
+  try {
+    // Find the user by ID and update the fields
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { name, password, role, google },
+      { new: true }
+    );
+
+    res.json({
+      msg: "User updated successfully",
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error updating user",
+      error: error.message,
+    });
+  }
 };
 
 // Endpoint POST
 const usersPost = async (req, res) => {
-  
-
   // const { name, age } = req.body;
 
   // Fields to be save in Mongo

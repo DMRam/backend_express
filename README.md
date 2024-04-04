@@ -43,3 +43,7 @@ execute
 chmod 600 /Users/dannymunoz/Documents/Danny/UNAB/2024/Desarrollo/Privatekey/ssh-key-2024-03-30.key (To protect key)
 
 ssh -i /Users/dannymunoz/Documents/Danny/UNAB/2024/Desarrollo/Privatekey/ssh-key-2024-03-30.key opc@151.145.35.253
+
+
+# Deploy to Google Cloud
+gcloud app deploy
