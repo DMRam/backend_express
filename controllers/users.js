@@ -5,8 +5,8 @@ const bcryptjs = require("bcryptjs");
 const usersGet = async (req = request, res = response) => {
   // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
 
-  // Query to filter for state = true
-  const query = { state: true };
+  // Query to filter for status = true
+  const query = { status: true };
 
   const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/users?from=10&limit=2 => return object 11 - 12
 
@@ -75,15 +75,18 @@ const usersPost = async (req, res) => {
 const usersDelete = async (req, res) => {
   const { id } = req.params;
 
+  const uid = req.uid;
+  
   // This is to remove an user
   // const userToBeDeleted = await UserModel.findByIdAndDelete(id);
 
-  // This is to change user state to false
-  const userToBeDeletedByStateToFalse = await UserModel.findByIdAndUpdate(id, {
-    state: false,
+  // This is to change user status to false
+  const userToBeDeletedByStatusToFalse = await UserModel.findByIdAndUpdate(id, {
+    status: false,
   });
+  const user = req.user;
 
-  res.json(userToBeDeleted);
+  res.json({ userToBeDeletedByStatusToFalse, user });
 };
 
 module.exports = {
