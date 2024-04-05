@@ -7,12 +7,13 @@ const {
   usersPost,
   usersDelete,
 } = require("../controllers/users");
-const { fieldValidate } = require("../middleware/field-validation");
+
 const {
   isValidRole,
   existEmail,
   existUserById,
 } = require("../helpers/db-validators");
+const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
 
 const router = Router();
 
@@ -45,6 +46,8 @@ router.post(
 router.delete(
   "/:id",
   [
+    validateJWT,
+    isAdminRole,
     check("id", "No es un Id Válido").isMongoId(),
     check("id").custom(existUserById),
     fieldValidate,
