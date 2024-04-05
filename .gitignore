@@ -44,6 +44,5 @@ yarn.lock
 # Ignore editor backup files
 *~
 
-
-#Mongo Credentials
-# .env
+# Ignore Google credentials
+*.json # Assuming Google credentials are stored in JSON files
