@@ -18,6 +18,7 @@ const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
 const router = Router();
 
 router.get("/", usersGet);
+
 router.put(
   "/:id",
   [
@@ -28,6 +29,7 @@ router.put(
   ],
   usersPut
 );
+
 router.post(
   "/",
   [
@@ -43,6 +45,7 @@ router.post(
   ],
   usersPost
 );
+
 router.delete(
   "/:id",
   [

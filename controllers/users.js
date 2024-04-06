@@ -4,7 +4,6 @@ const bcryptjs = require("bcryptjs");
 // Endpoint GET
 const usersGet = async (req = request, res = response) => {
   // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
-
   // Query to filter for status = true
   const query = { status: true };
 
