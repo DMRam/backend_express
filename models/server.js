@@ -22,10 +22,30 @@ class Server {
     await dbConnection();
   }
 
+  // CORS
+
   //Middleware
   middleware() {
+    const whitelist = ["http://localhost:3000", "http://localhost:3001"];
+
+    let ori = "";
+
+    const corsOptions = {
+      origin: function (origin, callback) {
+        ori = origin;
+        console.log(origin + " <- ORIGIN *************");
+        if (whitelist.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+    };
+
+    console.log(ori + " <- ORIGIN - ORI *************");
+
     //CORS
-    this.app.use(cors({ origin: "*" }));
+    this.app.use(cors(corsOptions));
 
     // Lectura y parseo del body
     this.app.use(express.json());
