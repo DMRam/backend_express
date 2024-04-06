@@ -25,7 +25,7 @@ class Server {
   //Middleware
   middleware() {
     //CORS
-    this.app.use(cors());
+    this.app.use(cors({ origin: "*" }));
 
     // Lectura y parseo del body
     this.app.use(express.json());
