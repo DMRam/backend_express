@@ -46,3 +46,4 @@ yarn.lock
 
 # Ignore Google credentials
 *.json # Assuming Google credentials are stored in JSON files
+app.yaml
