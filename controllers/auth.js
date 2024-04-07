@@ -27,7 +27,7 @@ const login = async (req, res = response) => {
     // Check user password
     const validPassword = bcryptjs.compareSync(password, user.password);
 
-    console.log(password + " ------***** ------ "+ user.password)
+    console.log(password + " ------***** ------ " + user.password);
     if (!validPassword) {
       return res.status(400).json({
         msg: "Usuario / Password no son correctos Password incorrecto",
@@ -76,14 +76,16 @@ const googleSignIn = async (req, res = response) => {
 
     // Check user status
     if (!user.status) {
-      res.status(401).json({
+      return res.status(400).json({
         msg: "Hable con el administardor - Usuario bloqueado",
       });
     }
 
     //  token
     const token = await generateJWT(user.id);
-    res.status(500).json({
+
+    console.log("*** User generated ***");
+    res.json({
       user,
       token,
     });

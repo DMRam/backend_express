@@ -26,6 +26,7 @@ class Server {
 
   //Middleware
   middleware() {
+    // CORS Logic
     const whitelist = ["http://localhost:3000", "http://localhost:3001"];
 
     let ori = "";
