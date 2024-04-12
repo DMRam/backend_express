@@ -9,10 +9,8 @@ const {
 } = require("../controllers/rental");
 
 const {
-  isValidRole,
-  existEmail,
-  existUserById,
   existRentalById,
+  existRentalByAddress
 } = require("../helpers/db-validators");
 const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
 
@@ -34,8 +32,13 @@ router.post(
   "/",
   [
     check("systemName", "El nombre ingresado no es válido").not().isEmpty(),
+    check(
+      "ownerId",
+      "El owner de un contrato debe ser un Id valido de mongo"
+    ).isMongoId(),
     check("dateFrom").notEmpty(),
     check("dateTo").notEmpty(),
+    check("address", 'La direcció ya tiene un contrato vigente').custom(existRentalByAddress),
     // Role is intrinsic passed thought isValidRole - One argument function
     fieldValidate,
   ],

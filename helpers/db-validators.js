@@ -18,6 +18,23 @@ const existEmail = async (email = "") => {
   }
 };
 
+
+const existRentalByAddress = async (address = '') => {
+  // Check if email exist
+  const rentalIdExists = await RentalModel.findOne({ address });
+  if (rentalIdExists) {
+    throw new Error(`Ya existe un contrato para ${address}`);
+  }
+};
+
+const existRentalValidation = async (validation) => {
+  // Check if email exist
+  const rentalIdExists = await RentalModel.findOne({ validation });
+  if (rentalIdExists) {
+    throw new Error(`Ya existe un contrato para ${address}`);
+  }
+};
+
 const existUserById = async (id ) => {
   // Check if email exist
   const userExists = await UserModel.findById(id);
@@ -37,5 +54,6 @@ module.exports = {
   isValidRole,
   existEmail,
   existUserById,
-  existRentalById
+  existRentalById,
+  existRentalByAddress
 };

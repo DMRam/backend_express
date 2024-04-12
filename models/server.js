@@ -9,6 +9,8 @@ class Server {
     this.usersPath = "/api/users";
     this.authPath = "/api/auth";
     this.rentalPath = "/api/rentals";
+    this.clientPath = "/api/clients";
+    this.tenantPath = "/api/tenants";
 
     // Connect DB
     this.dbConnect();
@@ -48,7 +50,7 @@ class Server {
 
     // //CORS
     // this.app.use(cors(corsOptions));
-    this.app.use(cors())
+    this.app.use(cors());
 
     // Lectura y parseo del body
     this.app.use(express.json());
@@ -60,6 +62,8 @@ class Server {
     this.app.use(this.authPath, require("../routes/auth"));
     this.app.use(this.usersPath, require("../routes/user"));
     this.app.use(this.rentalPath, require("../routes/rental"));
+    this.app.use(this.clientPath, require("../routes/client"));
+    this.app.use(this.tenantPath, require("../routes/tenant"));
   }
 
   listen() {

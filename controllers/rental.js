@@ -1,39 +1,28 @@
 const { response, request } = require("express");
 const RentalModel = require("../models/rental");
-const bcryptjs = require("bcryptjs");
 
-// Endpoint GET
 const rentalGet = async (req = request, res = response) => {
-  // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
-  
-  // Query to filter for status = true
-  const query = { status: true };
+  try {
+    const query = { status: true };
+    const { limit = 5, from = 0 } = req.query;
 
-  const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/users?from=10&limit=2 => return object 11 - 12
+    const [total, rentals] = await Promise.all([
+      RentalModel.countDocuments(query),
+      RentalModel.find(query).skip(Number(from)).limit(Number(limit)),
+    ]);
 
-  // Getting filtered Users
-  // const users = await UserModel.find(query).skip(from).limit(Number(limit));
-
-  // const totalUsersRegistered = await UserModel.countDocuments(query);
-
-  // Arrays Destructuring -> Assign first position to Total and Second arrays position to users
-  const [total, rentals] = await Promise.all([
-    RentalModel.countDocuments(query),
-    RentalModel.find(query).skip(from).limit(Number(limit)),
-  ]);
-  res.json({
-    total,
-    rentals,
-  });
+    res.json({ total, rentals });
+  } catch (error) {
+    console.error("Error fetching rentals:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-// Endpoint PUT
 const rentalPut = async (req, res = response) => {
   const { id } = req.params;
   const { systemName, dateFrom, dateTo, status } = req.body;
 
   try {
-    // Find the user by ID and update the fields
     const rental = await RentalModel.findByIdAndUpdate(
       id,
       { systemName, dateFrom, dateTo, status },
@@ -42,46 +31,60 @@ const rentalPut = async (req, res = response) => {
 
     res.json(rental);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error updating rental",
-      error: error.message,
-    });
+    console.error("Error updating rental:", error);
+    res.status(500).json({ error: "Error updating rental" });
   }
 };
 
-// Endpoint POST
 const rentalPost = async (req, res) => {
-  // const { name, age } = req.body;
+  const {
+    systemName,
+    ownerId,
+    address,
+    dateFrom,
+    dateTo,
+    status,
+    client,
+    tenant,
+  } = req.body;
 
-  // Fields to be save in Mongo
-  const { systemName, dateFrom, dateTo, status  } = req.body;
-  const rental = new RentalModel({ systemName, dateFrom, dateTo, status });
+  // Check if ownerId is provided
+  if (!ownerId) {
+    return res
+      .status(400)
+      .json({ error: "El contrato debe especificar un creador" });
+  }
 
-  await rental.save();
-
-  res.status(201).json({
-    ok: true,
-    rental,
+  const rental = new RentalModel({
+    systemName,
+    ownerId,
+    address,
+    dateFrom,
+    dateTo,
+    status,
+    client,
+    tenant,
   });
+
+  try {
+    await rental.save();
+    res.status(201).json({ rental });
+  } catch (error) {
+    console.error("Error creating rental:", error);
+    res.status(500).json({ error: "Error creating rental" });
+  }
 };
 
-// Endpoint DELETE
 const rentalDelete = async (req, res) => {
   const { id } = req.params;
 
-  const uid = req.uid;
-  
-  // This is to remove an user
-  // const userToBeDeleted = await UserModel.findByIdAndDelete(id);
-
-  // This is to change user status to false
-  const rentalToBeDeletedByStatusToFalse = await RentalModel.findByIdAndUpdate(id, {
-    status: false,
-  });
-  const rental = req.rental;
-
-  res.json({ rentalToBeDeletedByStatusToFalse, rental });
+  try {
+    const rental = await RentalModel.findByIdAndUpdate(id, { status: false });
+    res.json({ rental });
+  } catch (error) {
+    console.error("Error deleting rental:", error);
+    res.status(500).json({ error: "Error deleting rental" });
+  }
 };
 
 module.exports = {
