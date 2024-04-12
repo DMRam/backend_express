@@ -8,6 +8,7 @@ class Server {
     this.port = process.env.PORT;
     this.usersPath = "/api/users";
     this.authPath = "/api/auth";
+    this.rentalPath = "/api/rentals";
 
     // Connect DB
     this.dbConnect();
@@ -27,27 +28,27 @@ class Server {
   //Middleware
   middleware() {
     // CORS Logic
-    const whitelist = ["http://localhost:3000", "http://localhost:3001"];
+    // const whitelist = ["http://localhost:3000", "http://localhost:3001", 'https://immobilier-f87b1.web.app'];
 
-    let ori = "";
+    // let ori = "";
 
-    const corsOptions = {
-      origin: function (origin, callback) {
-        ori = origin;
-        console.log(origin + " <- ORIGIN *************");
-        if (whitelist.indexOf(origin) !== -1) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-    };
+    // const corsOptions = {
+    //   origin: function (origin, callback) {
+    //     ori = origin;
+    //     console.log(origin + " <- ORIGIN *************");
+    //     if (whitelist.indexOf(origin) !== -1) {
+    //       callback(null, true);
+    //     } else {
+    //       callback(new Error("Not allowed by CORS"));
+    //     }
+    //   },
+    // };
 
-    console.log(ori + " <- ORIGIN - ORI *************");
+    // console.log(ori + " <- ORIGIN - ORI *************");
 
-    //CORS
-    this.app.use(cors(corsOptions));
-    // this.app.use(cors())
+    // //CORS
+    // this.app.use(cors(corsOptions));
+    this.app.use(cors())
 
     // Lectura y parseo del body
     this.app.use(express.json());
@@ -58,6 +59,7 @@ class Server {
   routes() {
     this.app.use(this.authPath, require("../routes/auth"));
     this.app.use(this.usersPath, require("../routes/user"));
+    this.app.use(this.rentalPath, require("../routes/rental"));
   }
 
   listen() {

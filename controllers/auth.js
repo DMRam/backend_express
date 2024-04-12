@@ -59,17 +59,16 @@ const googleSignIn = async (req, res = response) => {
     // Check email
     let user = await UserModel.findOne({ email });
 
+    // Create user
+    const data = {
+      name,
+      email,
+      password: ":P",
+      img,
+      google: true,
+    };
+
     if (!user) {
-      // Create user
-
-      const data = {
-        name,
-        email,
-        password: ":P",
-        img,
-        google: true,
-      };
-
       user = new UserModel(data);
       await user.save();
     }
@@ -81,8 +80,8 @@ const googleSignIn = async (req, res = response) => {
       });
     }
 
-    //  token
-    const token = await generateJWT(user.id);
+    //  token --- MODIFIED 7 abril
+    const token = await generateJWT(user.uid);
 
     console.log("*** User generated ***");
     res.json({
