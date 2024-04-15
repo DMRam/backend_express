@@ -18,6 +18,10 @@ const RentalSchema = new Schema({
     type: String,
     required: [true, "El contrato debe especificar una dirección "],
   },
+  propertyRole: {
+    type: String,
+    required: [true, "El contrato debe especificar una rol "],
+  },
   dateFrom: {
     type: String,
     required: [true, "Fecha contrato desde"],

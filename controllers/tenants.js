@@ -25,16 +25,46 @@ const tenantsGet = async (req = request, res = response) => {
   });
 };
 
+const getTenantByEmail = async (req = request, res = response) => {
+  const { email } = req.params;
+
+  try {
+    // Find the tenant by email
+    const tenant = await TenantModel.findOne({ email });
+
+    if (!tenant) {
+      return res.status(404).json({
+        msg: "Tenant not found",
+      });
+    }
+
+    res.json({
+      msg: "Tenant found",
+      tenant,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error finding tenant by email",
+      error: error.message,
+    });
+  }
+};
+
 // Endpoint PUT
 const tenantsPut = async (req, res = response) => {
   const { id } = req.params;
-  const { name, email  } = req.body;
+  const { name, email, img, status, brokerIdAssociated } = req.body;
 
   try {
-    // Find the tenant by ID and update the fields
+    // Find the tenant by ID and update the fields, appending to brokerIdAssociated
     const tenant = await TenantModel.findByIdAndUpdate(
       id,
-      { name, email },
+      {
+        name,
+        email,
+        $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
+      },
       { new: true }
     );
 
@@ -53,8 +83,8 @@ const tenantsPost = async (req, res) => {
   // const { name, age } = req.body;
 
   // Fields to be save in Mongo
-  const { name, email, } = req.body;
-  const tenant = new TenantModel({ name, email});
+  const { name, email, img, status, brokerIdAssociated = "" } = req.body;
+  const tenant = new TenantModel({ name, email, brokerIdAssociated });
 
   await tenant.save();
 
@@ -70,14 +100,17 @@ const tenantsDelete = async (req, res) => {
   const { id } = req.params;
 
   const uid = req.uid;
-  
+
   // This is to remove an tenant
   // const tenantToBeDeleted = await TenantModel.findByIdAndDelete(id);
 
   // This is to change tenant status to false
-  const tenantToBeDeletedByStatusToFalse = await TenantModel.findByIdAndUpdate(id, {
-    status: false,
-  });
+  const tenantToBeDeletedByStatusToFalse = await TenantModel.findByIdAndUpdate(
+    id,
+    {
+      status: false,
+    }
+  );
   const tenant = req.tenant;
 
   res.json({ tenantToBeDeletedByStatusToFalse, tenant });
@@ -88,4 +121,5 @@ module.exports = {
   tenantsPost,
   tenantsPut,
   tenantsDelete,
+  getTenantByEmail,
 };

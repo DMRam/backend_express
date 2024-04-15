@@ -8,7 +8,7 @@ const TenantSchema = Schema({
   email: {
     type: String,
     require: [true, "El correo es obligatorio"],
-    unique: true,
+    // unique: true,
   },
   img: {
     type: String,
@@ -17,8 +17,17 @@ const TenantSchema = Schema({
     type: Boolean,
     default: true,
   },
+  brokerIdAssociated: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: function (value) {
+        return new Set(value).size === value.length; // Checks if all elements are unique
+      },
+      message: (props) => `${props.value} contains duplicate elements`,
+    },
+  },
 });
-
 TenantSchema.methods.toJSON = function () {
   const { __v, _id, ...tenant } = this.toObject();
   tenant.uid = _id;

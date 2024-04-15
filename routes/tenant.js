@@ -5,11 +5,10 @@ const {
   tenantsPut,
   tenantsPost,
   tenantsDelete,
+  getTenantByEmail,
 } = require("../controllers/tenants");
 
-const {
-  existEmail,
-} = require("../helpers/db-validators");
+const { existEmail } = require("../helpers/db-validators");
 const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
 
 const router = Router();
@@ -18,18 +17,22 @@ router.get("/", tenantsGet);
 
 router.put(
   "/:id",
-  [
-    check("id", "No es un Id Válido").isMongoId(),
-    fieldValidate,
-  ],
+  [check("id", "No es un Id Válido").isMongoId(), fieldValidate],
   tenantsPut
+);
+
+// Define the route for getting a tenant by email
+router.get(
+  "/email/:email",
+  [check("email", "Email no válido").isEmail(), fieldValidate],
+  getTenantByEmail
 );
 
 router.post(
   "/",
   [
     check("name", "El nombre ingresado no es válido").not().isEmpty(),
-    check("email").custom(existEmail),
+    // check("email").custom(existEmail),
     fieldValidate,
   ],
   tenantsPost
@@ -45,5 +48,4 @@ router.delete(
   ],
   tenantsDelete
 );
-
 module.exports = router;

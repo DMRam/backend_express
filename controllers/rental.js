@@ -41,6 +41,7 @@ const rentalPost = async (req, res) => {
     systemName,
     ownerId,
     address,
+    propertyRole,
     dateFrom,
     dateTo,
     status,
@@ -48,17 +49,18 @@ const rentalPost = async (req, res) => {
     tenant,
   } = req.body;
 
-  // Check if ownerId is provided
-  if (!ownerId) {
-    return res
-      .status(400)
-      .json({ error: "El contrato debe especificar un creador" });
-  }
+  // // Check if ownerId is provided
+  // if (!ownerId) {
+  //   return res
+  //     .status(400)
+  //     .json({ error: "El contrato debe especificar un creador" });
+  // }
 
   const rental = new RentalModel({
     systemName,
     ownerId,
     address,
+    propertyRole,
     dateFrom,
     dateTo,
     status,
@@ -66,9 +68,13 @@ const rentalPost = async (req, res) => {
     tenant,
   });
 
+  
   try {
     await rental.save();
-    res.status(201).json({ rental });
+    res.status(201).json({
+      ok: true,
+      rental,
+    });
   } catch (error) {
     console.error("Error creating rental:", error);
     res.status(500).json({ error: "Error creating rental" });

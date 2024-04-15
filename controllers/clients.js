@@ -1,6 +1,5 @@
 const { response, request } = require("express");
 const ClientModel = require("../models/client");
-const bcryptjs = require("bcryptjs");
 // Endpoint GET
 const clientsGet = async (req = request, res = response) => {
   // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;

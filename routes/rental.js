@@ -38,7 +38,7 @@ router.post(
     ).isMongoId(),
     check("dateFrom").notEmpty(),
     check("dateTo").notEmpty(),
-    check("address", 'La direcció ya tiene un contrato vigente').custom(existRentalByAddress),
+    check("address", 'La dirección ya tiene un contrato vigente').custom(existRentalByAddress),
     // Role is intrinsic passed thought isValidRole - One argument function
     fieldValidate,
   ],
