@@ -53,7 +53,7 @@ class Server {
     console.log(ori + " <- ORIGIN - ORI *************");
 
     // //CORS
-    // this.app.use(cors(corsOptions));
+    this.app.use(cors(corsOptions));
     // this.app.use(cors());
 
     // Lectura y parseo del body
