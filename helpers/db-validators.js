@@ -1,6 +1,7 @@
 const Role = require("../models/role");
 const UserModel = require("../models/user");
 const RentalModel = require("../models/rental");
+const ClientModel = require("../models/client");
 
 const isValidRole = async (role = "") => {
   console.log(role + "<<< ROLE RECEIVED >>> ");
@@ -15,6 +16,14 @@ const existEmail = async (email = "") => {
   const emailExists = await UserModel.findOne({ email });
   if (emailExists) {
     throw new Error(`El correo ${email} ya está registrado`);
+  }
+};
+
+const existClientsEmail = async (email = "") => {
+  // Check if email exist
+  const emailExists = await ClientModel.findOne({ email });
+  if (emailExists) {
+    throw new Error(`El correo ${email} ya está registrado como cliente`);
   }
 };
 
@@ -55,5 +64,6 @@ module.exports = {
   existEmail,
   existUserById,
   existRentalById,
-  existRentalByAddress
+  existRentalByAddress,
+  existClientsEmail
 };

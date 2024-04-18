@@ -48,4 +48,15 @@ router.delete(
   ],
   tenantsDelete
 );
+
+router.delete(
+  "/email/:email",
+  [
+    // validateJWT,
+    // isAdminRole,
+    check("email", "No es un Id Válido").isEmail(),
+    fieldValidate,
+  ],
+  tenantsDelete
+);
 module.exports = router;

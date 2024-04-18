@@ -1,14 +1,16 @@
 const { Schema, model } = require("mongoose");
 
+// Define the embedded schema for the property details
+
 const ClientSchema = Schema({
   name: {
     type: String,
-    require: [true, "El nombre es obligatorio"],
+    required: [true, "El nombre es obligatorio"],
   },
   email: {
     type: String,
-    require: [true, "El correo es obligatorio"],
-    unique: true,
+    required: [true, "El correo es obligatorio"],
+    // unique: true,
   },
   img: {
     type: String,
@@ -16,6 +18,30 @@ const ClientSchema = Schema({
   status: {
     type: Boolean,
     default: true,
+  },
+  brokerIdAssociated: {
+    type: [String],
+    default: [],
+    validate: {
+      validator: function (value) {
+        return new Set(value).size === value.length; // Checks if all elements are unique
+      },
+      message: (props) => `${props.value} contains duplicate elements`,
+    },
+  },
+  property: {
+    number: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    city: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
   },
 });
 

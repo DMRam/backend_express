@@ -52,7 +52,7 @@ class Server {
 
     console.log(ori + " <- ORIGIN - ORI *************");
 
-    // //CORS
+    // //CORS ALLOWED
     this.app.use(cors(corsOptions));
     // this.app.use(cors());
 

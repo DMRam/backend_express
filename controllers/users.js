@@ -7,7 +7,7 @@ const usersGet = async (req = request, res = response) => {
   // Query to filter for status = true
   const query = { status: true };
 
-  const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/users?from=10&limit=2 => return object 11 - 12
+  // const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/users?from=10&limit=2 => return object 11 - 12
 
   // Getting filtered Users
   // const users = await UserModel.find(query).skip(from).limit(Number(limit));
@@ -18,7 +18,7 @@ const usersGet = async (req = request, res = response) => {
   const [total, users] = await Promise.all([
     UserModel.countDocuments(query),
 
-    UserModel.find(query).skip(from).limit(Number(limit)),
+    UserModel.find(query)
   ]);
   res.json({
     total,

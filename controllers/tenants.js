@@ -1,12 +1,17 @@
 const { response, request } = require("express");
+const { Router } = require("express");
 const TenantModel = require("../models/tenant");
+const { check } = require("express-validator");
+const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
+const router = Router();
+
 // Endpoint GET
 const tenantsGet = async (req = request, res = response) => {
   // const { q, name = "GET ENDPOINT GRUPO 17 ----- PRUEBA", apiKey } = req.query;
   // Query to filter for status = true
   const query = { status: true };
 
-  const { limit = 5, from = 0 } = req.query; // http://localhost:8080/api/tenant?from=10&limit=2 => return object 11 - 12
+  // const { limit = 20, from = 0 } = req.query; // http://localhost:8080/api/tenant?from=10&limit=2 => return object 11 - 12
 
   // Getting filtered tenant
   // const tenant = await TenantModel.find(query).skip(from).limit(Number(limit));
@@ -17,7 +22,7 @@ const tenantsGet = async (req = request, res = response) => {
   const [total, tenant] = await Promise.all([
     TenantModel.countDocuments(query),
 
-    TenantModel.find(query).skip(from).limit(Number(limit)),
+    TenantModel.find(query),
   ]);
   res.json({
     total,
@@ -33,8 +38,17 @@ const getTenantByEmail = async (req = request, res = response) => {
     const tenant = await TenantModel.findOne({ email });
 
     if (!tenant) {
-      return res.status(404).json({
-        msg: "Tenant not found",
+      router.post(
+        "/",
+        [
+          check("name", "El nombre ingresado no es válido").not().isEmpty(),
+          // check("email").custom(existEmail),
+          fieldValidate,
+        ],
+        tenantsPost
+      );
+      return res.json({
+        msg: "Tenant not found - A new Record has been created",
       });
     }
 
@@ -56,6 +70,7 @@ const tenantsPut = async (req, res = response) => {
   const { id } = req.params;
   const { name, email, img, status, brokerIdAssociated } = req.body;
 
+  console.log(name)
   try {
     // Find the tenant by ID and update the fields, appending to brokerIdAssociated
     const tenant = await TenantModel.findByIdAndUpdate(
@@ -63,12 +78,12 @@ const tenantsPut = async (req, res = response) => {
       {
         name,
         email,
-        $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
+        // $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
       },
       { new: true }
     );
-
     res.json(tenant);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -97,23 +112,32 @@ const tenantsPost = async (req, res) => {
 
 // Endpoint DELETE
 const tenantsDelete = async (req, res) => {
-  const { id } = req.params;
+  const { email } = req.params;
 
-  const uid = req.uid;
+  try {
+    console.log("Email to delete:", email);
 
-  // This is to remove an tenant
-  // const tenantToBeDeleted = await TenantModel.findByIdAndDelete(id);
+    // This is to change client status to false
+    const tenantToBeDeletedByStatusToFalse = await TenantModel.findOneAndUpdate(
+      { email: email },
+      { status: false },
+      { new: true } // Optional: to return the updated document
+    );
 
-  // This is to change tenant status to false
-  const tenantToBeDeletedByStatusToFalse = await TenantModel.findByIdAndUpdate(
-    id,
-    {
-      status: false,
+    if (!tenantToBeDeletedByStatusToFalse) {
+      console.log("Tenant not found.");
+      return res.status(404).json({ message: "Tenant not found" });
     }
-  );
-  const tenant = req.tenant;
 
-  res.json({ tenantToBeDeletedByStatusToFalse, tenant });
+    console.log(
+      "Tenant updated successfully:",
+      tenantToBeDeletedByStatusToFalse
+    );
+    res.json({ tenantToBeDeletedByStatusToFalse });
+  } catch (error) {
+    console.error("Error deleting tenant:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 module.exports = {
