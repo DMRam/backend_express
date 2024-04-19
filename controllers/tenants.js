@@ -70,26 +70,54 @@ const tenantsPut = async (req, res = response) => {
   const { id } = req.params;
   const { name, email, img, status, brokerIdAssociated } = req.body;
 
-  console.log(name)
-  try {
-    // Find the tenant by ID and update the fields, appending to brokerIdAssociated
-    const tenant = await TenantModel.findByIdAndUpdate(
-      id,
-      {
-        name,
-        email,
-        // $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
-      },
-      { new: true }
-    );
-    res.json(tenant);
+  // Check if any document in the collection has the provided brokerIdAssociated in its array
+  const existingBrokerIdInTheList = await TenantModel.findOne({
+    brokerIdAssociated: { $in: [brokerIdAssociated] },
+  });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      msg: "Error updating tenant",
-      error: error.message,
-    });
+  let tenant; // Define the tenant variable outside the if-else blocks
+
+  console.log(existingBrokerIdInTheList + " LOG")
+  if (!existingBrokerIdInTheList) {
+    try {
+      // Find the tenant by ID and update the fields, appending to brokerIdAssociated
+      tenant = await TenantModel.findByIdAndUpdate(
+        id,
+        {
+          name,
+          email,
+          $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
+        },
+        { new: true }
+      );
+      res.json(tenant);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        msg: "Error updating tenant",
+        error: error.message,
+      });
+    }
+  } else {
+    try {
+      // Find the tenant by ID and update the fields, appending to brokerIdAssociated
+      tenant = await TenantModel.findByIdAndUpdate(
+        id,
+        {
+          name,
+          email,
+          // $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
+        },
+        { new: true }
+      );
+      res.json(tenant);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        msg: "Error updating tenant",
+        error: error.message,
+      });
+    }
   }
 };
 
@@ -97,17 +125,36 @@ const tenantsPut = async (req, res = response) => {
 const tenantsPost = async (req, res) => {
   // const { name, age } = req.body;
 
-  // Fields to be save in Mongo
-  const { name, email, img, status, brokerIdAssociated = "" } = req.body;
-  const tenant = new TenantModel({ name, email, brokerIdAssociated });
+  try {
+    // Fields to be save in Mongo
+    const { name, email, img, status, brokerIdAssociated = "" } = req.body;
 
-  await tenant.save();
+    // Check if any document in the collection has the provided brokerIdAssociated in its array
+    const existingBrokerIdInTheList = await TenantModel.findOne({
+      brokerIdAssociated: { $in: [brokerIdAssociated] },
+    });
 
-  res.status(201).json({
-    ok: true,
-    msg: "post - API - controller GRUPO 17",
-    tenant,
-  });
+    let tenant; // Define the tenant variable outside the if-else blocks
+
+    if (existingBrokerIdInTheList) {
+      tenant = new TenantModel({ name, email });
+    } else {
+      tenant = new TenantModel({ name, email, brokerIdAssociated });
+    }
+
+    await tenant.save();
+
+    res.status(201).json({
+      ok: true,
+      tenant,
+    });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error("Error creating tenant:", error);
+    res.status(500).json({
+      error: "Internal server error",
+    });
+  }
 };
 
 // Endpoint DELETE
