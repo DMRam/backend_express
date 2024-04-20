@@ -65,84 +65,108 @@ const getTenantByEmail = async (req = request, res = response) => {
   }
 };
 
+const getTenantByUid = async (req = request, res = response) => {
+  const { uid } = req.params;
+
+  try {
+    // Find the tenant by email
+    const tenant = await TenantModel.findById(uid);
+
+    res.json({
+      msg: "Tenant found",
+      tenant,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error finding tenant by email",
+      error: error.message,
+    });
+  }
+};
+
 // Endpoint PUT
 const tenantsPut = async (req, res = response) => {
   const { id } = req.params;
   const { name, email, img, status, brokerIdAssociated } = req.body;
 
-  // Check if any document in the collection has the provided brokerIdAssociated in its array
-  const existingBrokerIdInTheList = await TenantModel.findOne({
-    brokerIdAssociated: { $in: [brokerIdAssociated] },
-  });
+  try {
+    // Check if any document in the collection has the current brokerIdAssociated value in its array
+    const existingTenant = await TenantModel.findById(id);
 
-  let tenant; // Define the tenant variable outside the if-else blocks
+    if (!existingTenant) {
+      return res.status(404).json({ msg: "Tenant not found" });
+    }
 
-  console.log(existingBrokerIdInTheList + " LOG")
-  if (!existingBrokerIdInTheList) {
-    try {
-      // Find the tenant by ID and update the fields, appending to brokerIdAssociated
-      tenant = await TenantModel.findByIdAndUpdate(
-        id,
-        {
-          name,
-          email,
-          $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
-        },
-        { new: true }
-      );
-      res.json(tenant);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        msg: "Error updating tenant",
-        error: error.message,
+    // Update the tenant if user status is not false
+    if (existingTenant.status !== false) {
+      // Update tenant properties
+      existingTenant.name = name;
+      existingTenant.email = email;
+      existingTenant.img = img;
+      existingTenant.status = status;
+
+      // Filter out duplicate email addresses and update brokerIdAssociated
+      const uniqueBrokerIds = [
+        ...new Set([
+          ...existingTenant.brokerIdAssociated,
+          ...brokerIdAssociated,
+        ]),
+      ];
+      existingTenant.brokerIdAssociated = uniqueBrokerIds;
+
+      await existingTenant.save();
+      return res.json(existingTenant);
+    } else {
+      // If status is false, inform users to contact the admin team
+      return res.status(403).json({
+        msg: "This user is currently blocked. Please contact the admin team.",
       });
     }
-  } else {
-    try {
-      // Find the tenant by ID and update the fields, appending to brokerIdAssociated
-      tenant = await TenantModel.findByIdAndUpdate(
-        id,
-        {
-          name,
-          email,
-          // $push: { brokerIdAssociated: brokerIdAssociated }, // Append to brokerIdAssociated array
-        },
-        { new: true }
-      );
-      res.json(tenant);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
-        msg: "Error updating tenant",
-        error: error.message,
-      });
-    }
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ msg: "Error updating tenant", error: error.message });
   }
 };
 
 // Endpoint POST
 const tenantsPost = async (req, res) => {
-  // const { name, age } = req.body;
-
   try {
-    // Fields to be save in Mongo
+    // Fields to be saved in MongoDB
     const { name, email, img, status, brokerIdAssociated = "" } = req.body;
 
-    // Check if any document in the collection has the provided brokerIdAssociated in its array
-    const existingBrokerIdInTheList = await TenantModel.findOne({
-      brokerIdAssociated: { $in: [brokerIdAssociated] },
-    });
+    const checkIfExistsAlreadyByEmail = await TenantModel.findOne({ email });
 
-    let tenant; // Define the tenant variable outside the if-else blocks
-
-    if (existingBrokerIdInTheList) {
-      tenant = new TenantModel({ name, email });
+    let tenant; // Define the tenant variable outside the try-catch blocks
+    let uniqueBrokerIds;
+    if (checkIfExistsAlreadyByEmail) {
+      uniqueBrokerIds = [
+        ...new Set([
+          ...checkIfExistsAlreadyByEmail.brokerIdAssociated,
+          brokerIdAssociated,
+        ]),
+      ];
     } else {
-      tenant = new TenantModel({ name, email, brokerIdAssociated });
+      uniqueBrokerIds = brokerIdAssociated;
     }
 
-    await tenant.save();
+    if (!checkIfExistsAlreadyByEmail) {
+      // Create new tenant if it doesn't already exist
+      tenant = new TenantModel({
+        name,
+        email,
+        img,
+        status,
+        brokerIdAssociated: uniqueBrokerIds,
+      });
+      await tenant.save();
+    } else if (checkIfExistsAlreadyByEmail.status === false) {
+      return res.status(401).json({
+        msg: `${checkIfExistsAlreadyByEmail.email} No se puede crear - Hable con el administrador- No puede ejecutar esta acción`,
+      });
+    }
 
     res.status(201).json({
       ok: true,
@@ -193,4 +217,5 @@ module.exports = {
   tenantsPut,
   tenantsDelete,
   getTenantByEmail,
+  getTenantByUid,
 };

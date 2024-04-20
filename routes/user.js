@@ -6,6 +6,7 @@ const {
   usersPut,
   usersPost,
   usersDelete,
+  getUserByUid
 } = require("../controllers/users");
 
 const {
@@ -18,6 +19,13 @@ const { fieldValidate, isAdminRole, validateJWT } = require("../middleware");
 const router = Router();
 
 router.get("/", usersGet);
+
+// Define the route for getting a tenant by email
+router.get(
+  "/uid/:uid",
+  [check("uid", "No es un Id Válido").isMongoId(), fieldValidate],
+  getUserByUid
+);
 
 router.put(
   "/:id",

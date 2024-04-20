@@ -6,6 +6,7 @@ const {
   tenantsPost,
   tenantsDelete,
   getTenantByEmail,
+  getTenantByUid,
 } = require("../controllers/tenants");
 
 const { existEmail } = require("../helpers/db-validators");
@@ -26,6 +27,13 @@ router.get(
   "/email/:email",
   [check("email", "Email no válido").isEmail(), fieldValidate],
   getTenantByEmail
+);
+
+// Define the route for getting a tenant by email
+router.get(
+  "/uid/:uid",
+  [check("uid", "No es un Id Válido").isMongoId(), fieldValidate],
+  getTenantByUid
 );
 
 router.post(

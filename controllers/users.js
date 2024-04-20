@@ -26,6 +26,26 @@ const usersGet = async (req = request, res = response) => {
   });
 };
 
+const getUserByUid = async (req = request, res = response) => {
+  const { uid } = req.params;
+
+  try {
+    // Find the tenant by email
+    const user = await UserModel.findById(uid);
+
+    res.json({
+      msg: "User found",
+      user,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      msg: "Error finding tenant by email",
+      error: error.message,
+    });
+  }
+};
+
 // Endpoint PUT
 const usersPut = async (req, res = response) => {
   const { id } = req.params;
@@ -93,4 +113,5 @@ module.exports = {
   usersPost,
   usersPut,
   usersDelete,
+  getUserByUid
 };
